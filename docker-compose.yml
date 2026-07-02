@@ -1,0 +1,86 @@
+version: "3.8"
+
+# Compose "guarda-chuva" do ecossistema avu.
+#
+# Sobe 4 serviços numa única rede interna:
+#   - gateway       (nginx)  → externo :8081  (espelha /avu/rest/* do legado)
+#   - bff-bb        (fastapi) → só interno via rede docker
+#   - api-auth      (fastapi) → só interno via rede docker
+#   - api-auth-ldap (fastapi) → só interno via rede docker
+#
+# Cada serviço builda a partir da pasta irmã correspondente (../<nome>).
+# Requer que os 4 repos estejam clonados lado a lado.
+#
+# Para dev local (Mac ARM), o docker-compose puxa `platform: linux/amd64`
+# das partes definidas nos compose files individuais dos irmãos — como aqui
+# usamos só `build:`, definimos platform explicitamente.
+
+services:
+  gateway:
+    build:
+      context: ./proxy
+      dockerfile: Dockerfile
+    image: avu-gateway:dev
+    container_name: avu-gateway
+    platform: linux/amd64
+    ports:
+      - "${GATEWAY_PORT:-8081}:8000"
+    restart: unless-stopped
+    depends_on:
+      - bff-bb
+      - api-auth
+      - api-auth-ldap
+    networks:
+      - avu-net
+
+  bff-bb:
+    build:
+      context: ../bff-bb
+      dockerfile: Dockerfile
+    image: bff-bb:dev
+    container_name: bff-bb
+    platform: linux/amd64
+    env_file:
+      - ../bff-bb/.env
+    environment:
+      APP_ENV: ${APP_ENV:-dev}
+    volumes:
+      - ../bff-bb/secrets:/secrets:ro
+    restart: unless-stopped
+    networks:
+      - avu-net
+
+  api-auth:
+    build:
+      context: ../api-auth
+      dockerfile: Dockerfile
+    image: api-auth:dev
+    container_name: api-auth
+    platform: linux/amd64
+    env_file:
+      - ../api-auth/.env
+    environment:
+      APP_ENV: ${APP_ENV:-dev}
+    restart: unless-stopped
+    networks:
+      - avu-net
+
+  api-auth-ldap:
+    build:
+      context: ../api-auth-ldap
+      dockerfile: Dockerfile
+    image: api-auth-ldap:dev
+    container_name: api-auth-ldap
+    platform: linux/amd64
+    env_file:
+      - ../api-auth-ldap/.env
+    environment:
+      APP_ENV: ${APP_ENV:-dev}
+    restart: unless-stopped
+    networks:
+      - avu-net
+
+networks:
+  avu-net:
+    name: avu-net
+    driver: bridge
