@@ -4,10 +4,11 @@
 #   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 #
 # Pré-requisitos no host (mesma máquina):
-#   /home/glucca/bff-bb          (com .env e secrets/)
-#   /home/glucca/api-auth        (com .env)
-#   /home/glucca/api-auth-ldap   (com .env)
-#   /home/glucca/avu-api         (este projeto)
+#   /home/glucca/bff-bb           (com .env e secrets/)
+#   /home/glucca/api-auth         (com .env)
+#   /home/glucca/api-auth-ldap    (com .env)
+#   /home/glucca/api-webhook-uem  (com .env)
+#   /home/glucca/avu-api          (este projeto)
 
 services:
   gateway:
@@ -42,6 +43,17 @@ services:
         max-file: "5"
 
   api-auth-ldap:
+    platform: ""
+    environment:
+      APP_ENV: prod
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  api-webhook-uem:
     platform: ""
     environment:
       APP_ENV: prod

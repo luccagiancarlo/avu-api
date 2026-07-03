@@ -2,14 +2,15 @@ version: "3.8"
 
 # Compose "guarda-chuva" do ecossistema avu.
 #
-# Sobe 4 serviços numa única rede interna:
-#   - gateway       (nginx)  → externo :8081  (espelha /avu/rest/* do legado)
-#   - bff-bb        (fastapi) → só interno via rede docker
-#   - api-auth      (fastapi) → só interno via rede docker
-#   - api-auth-ldap (fastapi) → só interno via rede docker
+# Sobe 5 serviços numa única rede interna:
+#   - gateway         (nginx)  → externo :8081  (espelha /avu/rest/* do legado)
+#   - bff-bb          (fastapi) → só interno via rede docker
+#   - api-auth        (fastapi) → só interno via rede docker
+#   - api-auth-ldap   (fastapi) → só interno via rede docker
+#   - api-webhook-uem (fastapi) → só interno via rede docker
 #
 # Cada serviço builda a partir da pasta irmã correspondente (../<nome>).
-# Requer que os 4 repos estejam clonados lado a lado.
+# Requer que os 5 repos estejam clonados lado a lado.
 #
 # Para dev local (Mac ARM), o docker-compose puxa `platform: linux/amd64`
 # das partes definidas nos compose files individuais dos irmãos — como aqui
@@ -30,6 +31,7 @@ services:
       - bff-bb
       - api-auth
       - api-auth-ldap
+      - api-webhook-uem
     networks:
       - avu-net
 
@@ -74,6 +76,21 @@ services:
     platform: linux/amd64
     env_file:
       - ../api-auth-ldap/.env
+    environment:
+      APP_ENV: ${APP_ENV:-dev}
+    restart: unless-stopped
+    networks:
+      - avu-net
+
+  api-webhook-uem:
+    build:
+      context: ../api-webhook-uem
+      dockerfile: Dockerfile
+    image: api-webhook-uem:dev
+    container_name: api-webhook-uem
+    platform: linux/amd64
+    env_file:
+      - ../api-webhook-uem/.env
     environment:
       APP_ENV: ${APP_ENV:-dev}
     restart: unless-stopped
