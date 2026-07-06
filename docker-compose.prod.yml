@@ -8,6 +8,7 @@
 #   /home/glucca/api-auth         (com .env)
 #   /home/glucca/api-auth-ldap    (com .env)
 #   /home/glucca/api-webhook-uem  (com .env)
+#   /home/glucca/api-webhook-fadec(com .env)
 #   /home/glucca/avu-api          (este projeto)
 
 services:
@@ -54,6 +55,17 @@ services:
         max-file: "5"
 
   api-webhook-uem:
+    platform: ""
+    environment:
+      APP_ENV: prod
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  api-webhook-fadec:
     platform: ""
     environment:
       APP_ENV: prod
