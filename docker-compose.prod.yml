@@ -5,6 +5,7 @@
 #
 # Pré-requisitos no host (mesma máquina):
 #   /home/glucca/bff-bb           (com .env e secrets/)
+#   /home/glucca/bff-bb-fadec     (com .env e secrets/)
 #   /home/glucca/api-auth         (com .env)
 #   /home/glucca/api-auth-ldap    (com .env)
 #   /home/glucca/api-webhook-uem  (com .env)
@@ -25,6 +26,18 @@ services:
     platform: ""
     environment:
       APP_ENV: prod
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  bff-bb-fadec:
+    platform: ""
+    environment:
+      APP_ENV: prod
+      BB_FORCE_TLS12: "1"
     restart: always
     logging:
       driver: json-file

@@ -2,16 +2,17 @@ version: "3.8"
 
 # Compose "guarda-chuva" do ecossistema avu.
 #
-# Sobe 6 serviços numa única rede interna:
+# Sobe 7 serviços numa única rede interna:
 #   - gateway           (nginx)  → externo :8081  (espelha /avu/rest/* do legado)
-#   - bff-bb            (fastapi) → só interno via rede docker
+#   - bff-bb            (fastapi) → só interno via rede docker (PIX UEM)
+#   - bff-bb-fadec      (fastapi) → só interno via rede docker (PIX FADEC)
 #   - api-auth          (fastapi) → só interno via rede docker
 #   - api-auth-ldap     (fastapi) → só interno via rede docker
 #   - api-webhook-uem   (fastapi) → só interno via rede docker
 #   - api-webhook-fadec (fastapi) → só interno via rede docker
 #
 # Cada serviço builda a partir da pasta irmã correspondente (../<nome>).
-# Requer que os 6 repos estejam clonados lado a lado.
+# Requer que os 7 repos estejam clonados lado a lado.
 #
 # Para dev local (Mac ARM), o docker-compose puxa `platform: linux/amd64`
 # das partes definidas nos compose files individuais dos irmãos — como aqui
@@ -30,6 +31,7 @@ services:
     restart: unless-stopped
     depends_on:
       - bff-bb
+      - bff-bb-fadec
       - api-auth
       - api-auth-ldap
       - api-webhook-uem
@@ -50,6 +52,23 @@ services:
       APP_ENV: ${APP_ENV:-dev}
     volumes:
       - ../bff-bb/secrets:/secrets:ro
+    restart: unless-stopped
+    networks:
+      - avu-net
+
+  bff-bb-fadec:
+    build:
+      context: ../bff-bb-fadec
+      dockerfile: Dockerfile
+    image: bff-bb-fadec:dev
+    container_name: bff-bb-fadec
+    platform: linux/amd64
+    env_file:
+      - ../bff-bb-fadec/.env
+    environment:
+      APP_ENV: ${APP_ENV:-dev}
+    volumes:
+      - ../bff-bb-fadec/secrets:/secrets:ro
     restart: unless-stopped
     networks:
       - avu-net
