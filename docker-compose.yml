@@ -2,17 +2,22 @@ version: "3.8"
 
 # Compose "guarda-chuva" do ecossistema avu.
 #
-# Sobe 7 serviços numa única rede interna:
-#   - gateway           (nginx)  → externo :8081  (espelha /avu/rest/* do legado)
-#   - bff-bb            (fastapi) → só interno via rede docker (PIX UEM)
-#   - bff-bb-fadec      (fastapi) → só interno via rede docker (PIX FADEC)
-#   - api-auth          (fastapi) → só interno via rede docker
-#   - api-auth-ldap     (fastapi) → só interno via rede docker
-#   - api-webhook-uem   (fastapi) → só interno via rede docker
-#   - api-webhook-fadec (fastapi) → só interno via rede docker
+# Sobe 7 serviços ativos numa única rede interna:
+#   - gateway             (nginx)   → externo :8081 (espelha /avu/rest/* do legado)
+#   - bff-bb              (fastapi) → só interno via rede docker (PIX UEM)
+#   - bff-bb-fadec        (fastapi) → só interno via rede docker (PIX FADEC)
+#   - api-vestibular-uem  (fastapi) → só interno via rede docker (POST /login candidato)
+#   - api-auth-ldap       (fastapi) → só interno via rede docker
+#   - api-webhook-uem     (fastapi) → só interno via rede docker
+#   - api-webhook-fadec   (fastapi) → só interno via rede docker
 #
 # Cada serviço builda a partir da pasta irmã correspondente (../<nome>).
 # Requer que os 7 repos estejam clonados lado a lado.
+#
+# Desativado em 2026-07 (bloco comentado abaixo):
+#   - api-auth: substituído por api-vestibular-uem no /login. O MVP original
+#     do api-auth nunca existiu no sistema legado; mantemos os arquivos para
+#     estudo futuro mas o serviço não sobe.
 #
 # Para dev local (Mac ARM), o docker-compose puxa `platform: linux/amd64`
 # das partes definidas nos compose files individuais dos irmãos — como aqui
@@ -32,7 +37,7 @@ services:
     depends_on:
       - bff-bb
       - bff-bb-fadec
-      - api-auth
+      - api-vestibular-uem
       - api-auth-ldap
       - api-webhook-uem
       - api-webhook-fadec
@@ -73,15 +78,34 @@ services:
     networks:
       - avu-net
 
-  api-auth:
+  # DESATIVADO em 2026-07: substituído por api-vestibular-uem (POST /login).
+  # Mantido comentado para referência histórica. Para reativar: descomente e
+  # ajuste a rota /avu/rest/login no proxy/nginx.conf.
+  #
+  # api-auth:
+  #   build:
+  #     context: ../api-auth
+  #     dockerfile: Dockerfile
+  #   image: api-auth:dev
+  #   container_name: api-auth
+  #   platform: linux/amd64
+  #   env_file:
+  #     - ../api-auth/.env
+  #   environment:
+  #     APP_ENV: ${APP_ENV:-dev}
+  #   restart: unless-stopped
+  #   networks:
+  #     - avu-net
+
+  api-vestibular-uem:
     build:
-      context: ../api-auth
+      context: ../api-vestibular-uem
       dockerfile: Dockerfile
-    image: api-auth:dev
-    container_name: api-auth
+    image: api-vestibular-uem:dev
+    container_name: api-vestibular-uem
     platform: linux/amd64
     env_file:
-      - ../api-auth/.env
+      - ../api-vestibular-uem/.env
     environment:
       APP_ENV: ${APP_ENV:-dev}
     restart: unless-stopped

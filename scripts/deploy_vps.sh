@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # scripts/deploy_vps.sh — deploy do gateway (avu-api) na VPS.
 #
-# Pré-requisito: os 3 irmãos (bff-bb, api-auth, api-auth-ldap) já estão
-# em /home/glucca/ na VPS com seus próprios .env + secrets, deployados
-# previamente pelos scripts de cada um.
+# Pré-requisito: os 6 irmãos ativos (bff-bb, bff-bb-fadec, api-vestibular-uem,
+# api-auth-ldap, api-webhook-uem, api-webhook-fadec) já estão em /home/glucca/
+# na VPS com seus próprios .env + secrets, deployados previamente pelos
+# scripts de cada um.
+# api-auth foi desativado em 2026-07 — não é mais checado nem parado aqui.
 #
 # Uso:
 #   ./scripts/deploy_vps.sh                # sync + build + up
@@ -50,8 +52,10 @@ else
   fi
 fi
 
+SIBLINGS=(bff-bb bff-bb-fadec api-vestibular-uem api-auth-ldap api-webhook-uem api-webhook-fadec)
+
 echo "→ verificando pastas irmãs na VPS"
-for sibling in bff-bb api-auth api-auth-ldap; do
+for sibling in "${SIBLINGS[@]}"; do
   if ! ssh_run "test -d /home/glucca/$sibling"; then
     echo "❌ /home/glucca/$sibling ausente na VPS. Deploy cada projeto primeiro."
     exit 1
@@ -62,9 +66,13 @@ echo "→ derrubando containers antigos individuais (se estiverem rodando)"
 # Cada projeto tinha seu próprio compose isolado. Como o gateway agora
 # orquestra todos, precisamos parar as instâncias avulsas para evitar
 # conflito de nomes e portas.
-for sibling in bff-bb api-auth api-auth-ldap; do
+for sibling in "${SIBLINGS[@]}"; do
   ssh_run "cd /home/glucca/$sibling && docker compose down 2>/dev/null || true"
 done
+
+# api-auth desativado em 2026-07 — se ficou algum container/imagem antiga,
+# derruba explicitamente (não é fatal se não existir).
+ssh_run "docker ps -q -f name=api-auth | xargs -r docker rm -f 2>/dev/null || true"
 
 echo "→ build + up do compose guarda-chuva"
 ssh_run "cd $REMOTE_DIR && docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build"
