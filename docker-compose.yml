@@ -41,6 +41,7 @@ services:
       - api-auth-ldap
       - api-webhook-uem
       - api-webhook-fadec
+      - api-id-uem
     networks:
       - avu-net
 
@@ -153,6 +154,25 @@ services:
       - ../api-webhook-fadec/.env
     environment:
       APP_ENV: ${APP_ENV:-dev}
+    restart: unless-stopped
+    networks:
+      - avu-net
+
+  api-id-uem:
+    build:
+      context: ../api-id-uem
+      dockerfile: Dockerfile
+    image: api-id-uem:dev
+    container_name: api-id-uem
+    platform: linux/amd64
+    env_file:
+      - ../api-id-uem/.env
+    environment:
+      APP_ENV: ${APP_ENV:-dev}
+    volumes:
+      - /home/sistemas/SEC:/data/sec:ro
+    tmpfs:
+      - /tmp/carteira:size=100M
     restart: unless-stopped
     networks:
       - avu-net

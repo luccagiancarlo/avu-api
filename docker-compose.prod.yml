@@ -103,3 +103,14 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
+
+  api-id-uem:
+    platform: ""
+    environment:
+      APP_ENV: prod
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
