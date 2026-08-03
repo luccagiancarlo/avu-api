@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # scripts/deploy_vps.sh — deploy do gateway (avu-api) na VPS.
 #
-# Pré-requisito: os 6 irmãos ativos (bff-bb, bff-bb-fadec, api-vestibular-uem,
-# api-auth-ldap, api-webhook-uem, api-webhook-fadec) já estão em /home/glucca/
-# na VPS com seus próprios .env + secrets, deployados previamente pelos
-# scripts de cada um.
+# Pré-requisito: os 7 irmãos ativos (bff-bb, bff-bb-fadec, api-vestibular-uem,
+# api-auth-ldap, api-webhook-uem, api-webhook-fadec, api-id-uem) já estão em
+# /home/glucca/ na VPS com seus próprios .env + secrets, deployados previamente
+# pelos scripts de cada um.
 # api-auth foi desativado em 2026-07 — não é mais checado nem parado aqui.
 #
 # Uso:
@@ -52,7 +52,7 @@ else
   fi
 fi
 
-SIBLINGS=(bff-bb bff-bb-fadec api-vestibular-uem api-auth-ldap api-webhook-uem api-webhook-fadec)
+SIBLINGS=(bff-bb bff-bb-fadec api-vestibular-uem api-auth-ldap api-webhook-uem api-webhook-fadec api-id-uem)
 
 echo "→ verificando pastas irmãs na VPS"
 for sibling in "${SIBLINGS[@]}"; do
