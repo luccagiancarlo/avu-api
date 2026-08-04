@@ -42,6 +42,7 @@ services:
       - api-webhook-uem
       - api-webhook-fadec
       - api-id-uem
+      - api-fiscais-uem
     networks:
       - avu-net
 
@@ -173,6 +174,23 @@ services:
       - /home/sistemas/SEC:/data/sec:ro
     tmpfs:
       - /tmp/carteira:size=100M
+    restart: unless-stopped
+    networks:
+      - avu-net
+
+  api-fiscais-uem:
+    build:
+      context: ../api-fiscais-uem
+      dockerfile: Dockerfile
+    image: api-fiscais-uem:dev
+    container_name: api-fiscais-uem
+    platform: linux/amd64
+    env_file:
+      - ../api-fiscais-uem/.env
+    environment:
+      APP_ENV: ${APP_ENV:-dev}
+    volumes:
+      - /home/sistemas/CVU:/data/cvu:rw
     restart: unless-stopped
     networks:
       - avu-net

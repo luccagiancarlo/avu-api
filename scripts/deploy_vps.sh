@@ -52,7 +52,7 @@ else
   fi
 fi
 
-SIBLINGS=(bff-bb bff-bb-fadec api-vestibular-uem api-auth-ldap api-webhook-uem api-webhook-fadec api-id-uem)
+SIBLINGS=(bff-bb bff-bb-fadec api-vestibular-uem api-auth-ldap api-webhook-uem api-webhook-fadec api-id-uem api-fiscais-uem)
 
 echo "→ verificando pastas irmãs na VPS"
 for sibling in "${SIBLINGS[@]}"; do
