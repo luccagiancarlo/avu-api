@@ -9,7 +9,7 @@ Este repositório **era** o skeleton FastAPI da reescrita PIX; o código foi mov
 ```
 Cliente
    │
-   └─► :8081/avu/rest/*  (host)
+   └─► :8080/avu/rest/*  (host)
               │
        ┌──────┴──────┐
        │   nginx     │  (container avu-gateway)
@@ -55,7 +55,7 @@ O compose deste repositório faz `build: ../<pasta>` para cada API.
 cp .env.example .env
 ./run.sh up
 ./run.sh test          # health + rota 404
-curl http://localhost:8081/avu/rest/health
+curl http://localhost:8080/avu/rest/health
 ```
 
 Para logs de uma API específica:
@@ -80,6 +80,6 @@ O script derruba os composes individuais antigos e sobe o compose guarda-chuva d
 ## Notas
 
 - As 3 APIs internas **não** expõem portas ao host quando o gateway está no ar — só ficam acessíveis pela rede docker `avu-net`.
-- Scripts como `bff-bb/scripts/teste_criar_pix.sh` continuam funcionando: atualize `BFF_BASE=http://186.233.154.240:8081/avu/rest` (ou `http://localhost:8081/avu/rest` em dev) para chamar através do gateway.
+- Scripts como `bff-bb/scripts/teste_criar_pix.sh` continuam funcionando: atualize `BFF_BASE=http://186.233.154.240:8080/avu/rest` (ou `http://localhost:8080/avu/rest` em dev) para chamar através do gateway.
 - O JWT emitido por `api-auth` ou `api-auth-ldap` é aceito por `bff-bb` (mesmo `JWT_SECRET`).
 - Health do gateway em `/avu/rest/health` e também em `/health` (para o Docker healthcheck).

@@ -82,5 +82,5 @@ ssh_run "cd $REMOTE_DIR && docker compose ps"
 
 echo
 echo "✅ deploy concluído. Testes:"
-echo "   ssh $HOST 'curl -fsS http://localhost:8081/avu/rest/health'"
+echo "   ssh $HOST 'curl -fsS http://localhost:8080/avu/rest/health'"
 echo "   ssh $HOST 'cd $REMOTE_DIR && docker compose logs -f gateway'"

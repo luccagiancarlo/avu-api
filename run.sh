@@ -22,7 +22,7 @@ else
   COMPOSE="docker-compose"
 fi
 
-PORT="${GATEWAY_PORT:-8081}"
+PORT="${GATEWAY_PORT:-8080}"
 
 case "${1:-help}" in
   up)
