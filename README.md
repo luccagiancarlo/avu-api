@@ -1,5 +1,11 @@
 # avu-api (gateway)
 
+> **Único orquestrador de produção.** Os composes isolados dos 8 projetos
+> backend foram renomeados para `docker-compose.dev.yml` (só dev local).
+> Este `avu-api/docker-compose.yml` + `docker-compose.prod.yml` é a fonte
+> única de verdade para prod. Ver
+> `docs/superpowers/specs/2026-08-04-consolidacao-docker-compose-design.md`.
+
 Gateway/proxy reverso que espelha o caminho legado `/avu/rest/*` do sistema Java AVU, roteando as requisições para as 3 APIs Python que compõem o ecossistema.
 
 Este repositório **era** o skeleton FastAPI da reescrita PIX; o código foi movido para os 3 repos irmãos e este passou a atuar como fachada única.
